@@ -1,0 +1,16 @@
+node{
+    def mavenhome = tool name: 'maven3.9.9'
+    stage('CheckoutCode'){
+        git branch: 'development', credentialsId: '95b69b0f-7f40-4650-bb28-90a2cf08ac7d', url: 'https://github.com/sivanandalahari/maven-web-application.git'
+    }
+    stage('Build')
+    {
+        sh "${mavenhome}/bin/mvn clean package"
+    }
+    stage('Deploy')
+    {
+        sshagent(['ccfed2ba-f1a6-4c70-81aa-c4b631be6a96']) {
+            sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@13.233.178.153:/opt/tomcat/webapps/"
+        }
+    }
+}
